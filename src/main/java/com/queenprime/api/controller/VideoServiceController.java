@@ -21,7 +21,7 @@ public class VideoServiceController {
     }
 
     @GetMapping("/{videoId}")
-    public Video getVideoById(@PathVariable("videoId") Long videoId){
+    public Video getVideoById(@PathVariable("videoId") Integer videoId){
         return videoDaoJpa.getVideoById(videoId);
     }
 

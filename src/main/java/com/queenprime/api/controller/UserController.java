@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -78,22 +79,26 @@ public class UserController {
 	}
 	
 	@PostMapping(value = "/user/authenticate", consumes = "application/x-www-form-urlencoded;charset=UTF-8")
-	public String generateAuthenticationToken(@RequestParam String username, 
+	public ResponseEntity<String> generateAuthenticationToken(@RequestParam String username, 
 			@RequestParam String password) throws Exception {
 		
 		//System.out.println(username);
 		//System.out.println(password);
 		
-		authenticate(username, password);
+		try {
+			authenticate(username, password);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 		
-		User user = userService.findByUsername(username);
+		//User user = userService.findByUsername(username);
 		
-		return jwtTokenUtil.generateToken(jwtInMemoryUserDetailsService.loadUserByUsername(username));
+		return ResponseEntity.status(HttpStatus.OK).body(jwtTokenUtil.generateToken(jwtInMemoryUserDetailsService.loadUserByUsername(username)));
 	
 	}
 	
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
-	public String saveUser(@RequestParam String username, 
+	public ResponseEntity<String> saveUser(@RequestParam String username, 
 			@RequestParam String password, @RequestParam String firstname, 
 			@RequestParam String lastname,
 			@RequestParam String email) throws Exception {
@@ -105,9 +110,13 @@ public class UserController {
 		newUser.setUsername(username);
 		newUser.setSignUpDate(new Date(Calendar.getInstance().getTime().getTime()));
 		newUser.setIsSubscribed(0);
-		userService.save(newUser);
+		try {
+			userService.save(newUser);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 		
-		return "SUCCESS";
+		return ResponseEntity.status(HttpStatus.OK).body("Successfully Registered");
 	}
 	
 	private void authenticate(String username, String password) throws Exception {

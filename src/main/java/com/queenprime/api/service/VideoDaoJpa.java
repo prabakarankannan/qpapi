@@ -20,7 +20,7 @@ public class VideoDaoJpa {
         return videoRepository.findAll();
     }
 
-    public Video getVideoById(Long videoId){
+    public Video getVideoById(Integer videoId){
         return videoRepository.findById(videoId).orElse(null);
     }
 
@@ -39,8 +39,8 @@ public class VideoDaoJpa {
         Optional<Video> videoOptional = videoRepository.findById(video.getId());
         if (videoOptional.isPresent()) {
             Video currentVideo = videoOptional.get();
-            currentVideo.setName(video.getName());
-            currentVideo.setUrl(video.getUrl());
+            currentVideo.setTitle(video.getTitle());
+            currentVideo.setFilePath(video.getFilePath());
             videoRepository.save(currentVideo);
             return currentVideo;
         }
